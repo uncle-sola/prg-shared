@@ -9,6 +9,11 @@ parameters:
   SharedKeyVaultName: ''
   SharedPrefix: ''
   EnvAbbreviation: ''
+  SetTagsScriptFilePath: '$(System.DefaultWorkingDirectory)\Set-EsfaResourceGroupTags.ps1'
+  SetEsfaResourceGroupTagsScript: 'https://raw.githubusercontent.com/uncle-sola/prg-devops/master/PSScripts/Set-EsfaResourceGroupTags.ps1'
+  Location: 'West Europe'
+  ArmTemplateFolder: ''
+
 
 
 jobs:
@@ -35,6 +40,22 @@ jobs:
           inputs:
             targetType: inline
             script: 'Install-Module AzureAD -Force' # Required when targetType == Inline
+        - task: PowerShell@2
+          name: DownloadSetEsfaResourceGroupTagsScript
+          displayName: 'Download Set-EsfaResourceGroupTags script'
+          inputs:
+            targetType: 'inline'
+            script: Invoke-WebRequest -Uri ${{ parameters.SetEsfaResourceGroupTagsScript }} -OutFile ${{ parameters.SetTagsScriptFilePath }}
+
+        - task: AzurePowerShell@3
+          displayName:  "Create resource groups with tags"
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: ${{ parameters.SetTagsScriptFilePath }}
+            ScriptArguments: '-ResourceGroupName "${{ parameters.ResourceGroup }}" -Location "${{  parameters.Location  }}" -Environment "${{ parameters.EnvironmentTag }}" -ParentBusiness "${{ parameters.ParentBusinessTag }}" -ServiceOffering "${{ parameters.ServiceOfferingTag }}" -Verbose'
+            azurePowerShellVersion: LatestVersion
+
+
         # Create AKS service principals
         # - task: AzurePowerShell@3
         #   displayName: 'Azure PowerShell script: New-AksServicePrincipals.ps1'
