@@ -56,40 +56,40 @@ stages:
         artifactName: Mon.Shared.Resources.AksManifests
 
 
-- stage: DeployTo_DEV
-  condition: false
-  variables:
-  - group: prg-shared-all
-  - group: prg-shared-infrastructure-all
-  - template: VariableTemplates\SharedEnvironmentVariables.yml
-  - group: 'KeyVault - prg-dev-shared-kv'
-  - group: prg-shared-dev
-  - group: prg-aks-all
-  - group: prg-shared-infrastructure-dev
-  - group: prg-cds-dev
-  - template: VariableTemplates\DevEnvironmentVariables.yml
-  jobs:
-  - template: JobTemplates\Deploy.yml
-    parameters:
-      AzureSubscription: 'mon(cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224)'
-      AcrResourceGroup: $(ACRResourceGroup)
-      AksAdClientApplicationName: $(AksAdClientApplicationName)
-      AksAdServerApplicationName: $(AksAdServerApplicationName)
-      AksNodeResourceGroupName: $(AksNodeResourceGroupName)
-      AksServiceName: $(sharedAksCluster)
-      AksServicePrincipalName: $(AksServicePrincipalName)
-      CertificateIssuerAccountId: $(CertificateIssuerAccountId)
-      CertificateIssuerAdministratorPhoneNumber: $(CertificateIssuerAdministratorPhoneNumber)
-      CertificateIssuerPassword: $(CertificateIssuerPassword)
-      envAbbreviation: ${{ variables.envAbbreviation }}
-      Environment: 'DEV_SHARED'
-      EnvironmentTag: ${{ variables.EnvironmentTag }}
-      ResourceGroup: ${{ variables.resourceGroup }}
-      ParentBusinessTag: ${{ variables.ParentBusinessTag }}
-      ServiceOfferingTag: ${{ variables.ServiceOfferingTag }}
-      SharedKeyVaultName: $(sharedKeyVaultName)
-      SharedPrefix: ${{ variables.sharedPrefix }}
-      StorageAccountName: $(sharedDfcStorageAccountName)
+# - stage: DeployTo_DEV
+#   condition: false
+#   variables:
+#   - group: prg-shared-all
+#   - group: prg-shared-infrastructure-all
+#   - template: VariableTemplates\SharedEnvironmentVariables.yml
+#   - group: 'KeyVault - prg-dev-shared-kv'
+#   - group: prg-shared-dev
+#   - group: prg-aks-all
+#   - group: prg-shared-infrastructure-dev
+#   - group: prg-cds-dev
+#   - template: VariableTemplates\DevEnvironmentVariables.yml
+#   jobs:
+#   - template: JobTemplates\Deploy.yml
+#     parameters:
+#       AzureSubscription: 'mon(cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224)'
+#       AcrResourceGroup: $(ACRResourceGroup)
+#       AksAdClientApplicationName: $(AksAdClientApplicationName)
+#       AksAdServerApplicationName: $(AksAdServerApplicationName)
+#       AksNodeResourceGroupName: $(AksNodeResourceGroupName)
+#       AksServiceName: $(sharedAksCluster)
+#       AksServicePrincipalName: $(AksServicePrincipalName)
+#       CertificateIssuerAccountId: $(CertificateIssuerAccountId)
+#       CertificateIssuerAdministratorPhoneNumber: $(CertificateIssuerAdministratorPhoneNumber)
+#       CertificateIssuerPassword: $(CertificateIssuerPassword)
+#       envAbbreviation: ${{ variables.envAbbreviation }}
+#       Environment: 'DEV_SHARED'
+#       EnvironmentTag: ${{ variables.EnvironmentTag }}
+#       ResourceGroup: ${{ variables.resourceGroup }}
+#       ParentBusinessTag: ${{ variables.ParentBusinessTag }}
+#       ServiceOfferingTag: ${{ variables.ServiceOfferingTag }}
+#       SharedKeyVaultName: $(sharedKeyVaultName)
+#       SharedPrefix: ${{ variables.sharedPrefix }}
+#       StorageAccountName: $(sharedDfcStorageAccountName)
 
 # - stage: DeployTo_SIT
 #   condition: false
