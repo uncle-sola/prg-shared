@@ -80,8 +80,8 @@
     }
   },
   "variables": {
-    "monDevOpsTemplatesUrl": "https://raw.githubusercontent.com/olusola-adio/prg-devops/master/ArmTemplates/",
-    "localTemplatesUrl": "https://raw.githubusercontent.com/olusola-adio/prg-shared/master/Resources/",
+    "monDevOpsTemplatesUrl": "https://raw.githubusercontent.com/uncle-sola/prg-devops/master/ArmTemplates/",
+    "localTemplatesUrl": "https://raw.githubusercontent.com/uncle-sola/prg-shared/master/Resources/",
     "keyVaultName": "[concat(parameters('sharedPrefix'),'-kv')]",
     "defaultKeyVaultReadAccessHack": "[if(empty(parameters('defaultKeyVaultReadAccess')), 1, length(parameters('defaultKeyVaultReadAccess')))]",
     "defaultKeyVaultWriteAccessHack": "[if(empty(parameters('defaultKeyVaultWriteAccess')), 1, length(parameters('defaultKeyVaultWriteAccess')))]",
