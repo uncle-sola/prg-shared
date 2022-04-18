@@ -20,7 +20,7 @@ variables:
 - name: ReleaseEnvironmentName
   value: DEV
 - name: ACRResourceGroup
-  value: prg-$(envType)-app-sharedresources-rg
+  value: $(appSharedResourceGroup)
 - name: AksDnsServiceIp
   value: 10.2.5.10
 - name: AksServiceCidr
@@ -49,3 +49,5 @@ variables:
   value: $(sharedPrefix)-aks
 - name: ContainerRegistryAdminUser
   value: prgdevappsharedcr
+- name: appSharedResourceGroup
+  value: prg-$(envType)-app-sharedresources-rg

@@ -36,7 +36,7 @@ jobs:
         - script: dir $(System.DefaultWorkingDirectory)
         - script: dir $(Pipeline.Workspace)
         - script: dir $(Build.SourcesDirectory)\PSScripts\
-        - task: PowerShell@2
+        - task: PowerShell@4
           inputs:
             targetType: inline
             script: 'Install-Module AzureAD -Force' # Required when targetType == Inline
@@ -78,6 +78,21 @@ jobs:
             Contents: parameters.json
           condition: always()
 
+        - task: AzurePowerShell@3
+          displayName: 'Assign AcrPull to prg-$(envAbbreviation)-shared-aks'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: '$(System.DefaultWorkingDirectory)/prg-shared/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
+            ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks" -RoleDefinitionName "AcrPull" -Verbose'
+            azurePowerShellVersion: LatestVersion
+
+        - task: AzurePowerShell@3
+          displayName: 'Assign AcrPull to prg-$(envAbbreviation)-shared-aks-agentpool'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: '$(System.DefaultWorkingDirectory)/prg-shared/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
+            ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks-agentpool" -RoleDefinitionName "AcrPull" -Verbose'
+            azurePowerShellVersion: LatestVersion
 
         # Create AKS service principals
         # - task: AzurePowerShell@3
