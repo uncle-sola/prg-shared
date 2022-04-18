@@ -1,0 +1,35 @@
+variables:
+- name: apimExists
+  value: true
+- name: apimSkuTier
+  value: Developer
+- name: appGatewayCloudServiceIpAddress
+  value: $(cloudServiceIp)
+- name: appGatewayNsgName
+  value: $(sharedPrefix)-ag-nsg
+- name: appGatewaySubnetName
+  value: prg-ag-01
+- name: appGatewayVnetName
+  value: ''
+- name: deployManageSql
+  value: false
+- name: msqlSubnetName
+  value: prg-msql-01
+- name: ParentBusinessTag
+  value: Logion Limited
+- name: portalApiKeyVaultCertificatePath
+  value: $(defaultApiKeyVaultCertificatePath)
+- name: proxyApiKeyVaultCertificatePath
+  value: $(defaultApiKeyVaultCertificatePath)
+- name: resourceGroup
+  value: $(sharedPrefix)-rg
+- name: ServiceOfferingTag
+  value: Logion Website
+- name: threatDetectionEmailAddress
+  value: '[ "careersdevops@education.gov.uk" ]'
+- name: virtualNetworkNonRoutedSubnets
+  value: '[ "$(appGatewaySubnetName)" ]'
+- name: virtualNetworkRoutedSubnets
+  value: '[ "$(msqlSubnetName)" ]'
+- name: vnetResourceGroup
+  value: $(resourceGroup)

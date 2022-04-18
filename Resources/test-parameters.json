@@ -1,0 +1,58 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sharedPrefix": {
+      "value": "prg-local-shared"
+    },
+    "aksAgentVmSize": {
+      "value": "Standard_B2s"
+    },
+    "aksAgentNodeCount": {
+      "value": 2
+    },
+    "aksDnsServiceIp": {
+      "value": "10.2.5.10"
+    },
+    "aksKubernetesVersion": {
+      "value": "1.22.4"
+    },
+    "aksNodeResourceGroupName": {
+      "value": "prg-foo-stax-shared-aksnodes-rg"
+    },
+    "aksRbacTenantId": {
+      "value": "__AksRbacTenantId__"
+    },
+    "aksRouteTableName": {
+      "value": "aks-agentpool-12345678-routetable"
+    },
+    "aksServiceCidr": {
+      "value": "__AksServiceCidr__"
+    },
+    "aksSubnetName": {
+      "value": "prg-aks-01"
+    },
+    "aksVirtualNetworkAddressPrefix": {
+      "value": "10.0"
+    },
+    "aksVnetName": {
+      "value": "prg-foo-shared-aks-vnet"
+    },
+    "aksAppGatewaySubnetName": {
+      "value": "prg-aks-ag-01"
+    },
+    "defaultKeyVaultReadAccess": {
+      "value": [
+        "4d2471e2-510f-4d6e-a4b3-1f356b45c034",
+        "69671774-66b0-4465-af12-6ac44622417a",
+        "a46e640e-44d8-4f89-8f56-cb9ab12888e2"
+      ]
+    },
+    "defaultKeyVaultWriteAccess": {
+      "value": []
+    },
+    "aadProfileAdminGroupObjectIDs": {
+      "value": []
+    }
+  }
+}

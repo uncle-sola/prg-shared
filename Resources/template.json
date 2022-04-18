@@ -1,0 +1,323 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sharedPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Prefix for all resources created for the project (except storage account, see below). Should be in thee format prg-env-proj"
+      }
+    },
+    "aksAgentVmSize": {
+      "type": "string"
+    },
+    "aksAgentNodeCount": {
+      "type": "int"
+    },
+    "aksDnsServiceIp": {
+      "type": "string"
+    },
+    "aksKubernetesVersion": {
+      "type": "string"
+    },
+    "aksNodeResourceGroupName": {
+      "type": "string"
+    },
+    "aksRbacTenantId": {
+      "type": "string"
+    },
+    "aksRouteTableName": {
+      "type": "string"
+    },
+    "aksServiceCidr": {
+      "type": "string"
+    },
+    "aksSubnetName": {
+      "type": "string"
+    },
+    "aksVirtualNetworkAddressPrefix": {
+      "type": "string"
+    },
+    "aksVnetName": {
+      "type": "string"
+    },
+    "aksVnetCreate": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Bool to determine whether to create a VNet for AKS - defaults to create a VNet"
+      }
+    },
+    "aksVnetResourceGroupName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Only required if the VNet will be externally created (ie PP or PROD).  The resource group that holds the VNet that AKS will be connected to."
+      }
+    },
+    "aksAppGatewaySubnetName": {
+      "type": "string"
+    },
+    "defaultKeyVaultReadAccess": {
+      "type": "array",
+      "defaultValue": [
+      ]
+    },
+    "defaultKeyVaultWriteAccess": {
+      "type": "array",
+      "defaultValue": [
+      ],
+      "metadata": {
+        "description": "A list of azure service pricipals to assign write access to certificates on the shared key vault"
+      }
+    },
+    "aadProfileAdminGroupObjectIDs": {
+      "defaultValue": [],
+      "type": "array",
+      "metadata": {
+        "description": "Specifies the AAD group object IDs that will have admin role of the cluster."
+      }
+    }
+  },
+  "variables": {
+    "monDevOpsTemplatesUrl": "https://raw.githubusercontent.com/olusola-adio/prg-devops/master/ArmTemplates/",
+    "localTemplatesUrl": "https://raw.githubusercontent.com/olusola-adio/prg-shared/master/Resources/",
+    "keyVaultName": "[concat(parameters('sharedPrefix'),'-kv')]",
+    "defaultKeyVaultReadAccessHack": "[if(empty(parameters('defaultKeyVaultReadAccess')), 1, length(parameters('defaultKeyVaultReadAccess')))]",
+    "defaultKeyVaultWriteAccessHack": "[if(empty(parameters('defaultKeyVaultWriteAccess')), 1, length(parameters('defaultKeyVaultWriteAccess')))]",
+    "logAnalyticsWorkspaceName": "[concat(parameters('sharedPrefix'),'-la')]",
+    "logAnalyticsResourceGroupName": "[concat(parameters('sharedPrefix'),'-rg')]",    "aksClusterName": "[concat(parameters('sharedPrefix'), '-aks')]",
+    "aksNodeResourceGroupName": "[concat(variables('aksClusterName'), 'nodes-rg')]"
+  },
+  "resources": [
+        {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "name": "[variables('logAnalyticsWorkspaceName')]",
+      "apiVersion": "2020-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "resourceGroup": {
+          "name": "[variables('logAnalyticsResourceGroupName')]"
+        },
+        "sku": {
+          "name": "pergb2018"
+        }
+      }
+    },
+    {
+      "name": "sharedAzureKubernetesServiceNetwork",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[parameters('aksVnetCreate')]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('localTemplatesUrl'), 'networks/aks-vnet.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "aksNodeResourceGroupName": {
+            "value": "[parameters('aksNodeResourceGroupName')]"
+          },
+          "aksRouteTableName": {
+            "value": "[parameters('aksRouteTableName')]"
+          },
+          "aksSubnetName": {
+            "value": "[parameters('aksSubnetName')]"
+          },
+          "aksAppGatewaySubnetName": {
+            "value": "[parameters('aksAppGatewaySubnetName')]"
+          },
+          "virtualNetworkAddressPrefix": {
+            "value": "[parameters('aksVirtualNetworkAddressPrefix')]"
+          },
+          "vnetName": {
+            "value": "[parameters('aksVnetName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "sharedAzureKubernetesService",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('monDevOpsTemplatesUrl'),'aks.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "clusterName": {
+            "value": "[variables('aksClusterName')]"
+          },
+          "agentVMSize": {
+            "value": "[parameters('aksAgentVmSize')]"
+          },
+          "agentNodeCount": {
+            "value": "[parameters('aksAgentNodeCount')]"
+          },
+          "dnsServiceIp": {
+            "value": "[parameters('aksDnsServiceIp')]"
+          },
+          "kubernetesVersion": {
+            "value": "[parameters('aksKubernetesVersion')]"
+          },
+          "nodeResourceGroup": {
+            "value": "[variables('aksNodeResourceGroupName')]"
+          },
+          "rbacTenantId": {
+            "value": "[parameters('aksRbacTenantId')]"
+          },
+          "serviceCidr": {
+            "value": "[parameters('aksServiceCidr')]"
+          },
+          "subnetName": {
+            "value": "[parameters('aksSubnetName')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('aksVnetName')]"
+          },
+          "virtualNetworkResourceGroup": {
+            "value": "[if(parameters('aksVnetCreate'), resourceGroup().name, parameters('aksVnetResourceGroupName'))]"
+          },
+          "aadProfileAdminGroupObjectIDs": {
+            "value": "[parameters('aadProfileAdminGroupObjectIDs')]"
+          },
+          "logAnalyticsWorkspaceName": {
+            "value": "[variables('logAnalyticsWorkspaceName')]"
+          },
+          "logAnalyticsResourceGroupName": {
+            "value": "[variables('logAnalyticsResourceGroupName')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "sharedAzureKubernetesServiceNetwork",
+        "[variables('logAnalyticsWorkspaceName')]"
+      ]
+    },
+    {
+      "name": "sharedKeyVault",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('monDevOpsTemplatesUrl'),'keyvault.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('sharedKeyVaultDefaultReadAccessPolicy-', copyIndex())]",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[greater(length(parameters('defaultKeyVaultReadAccess')), 0)]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('monDevOpsTemplatesUrl'),'/KeyVault/keyvault-access-policy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "servicePrincipalObjectId": {
+            "value": "[parameters('defaultKeyVaultReadAccess')[copyIndex()]]"
+          },
+          "secretPermissions": {
+            "value": [
+              "get",
+              "list"
+            ]
+          },
+          "certificatePermissions": {
+            "value": [
+              "get",
+              "list",
+              "getissuers",
+              "listissuers"
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "sharedKeyVault"
+      ],
+      "metadata": {
+        "description": "The count parameter in the copy block is populated with either the length of the defaultKeyVaultReadAccess parameter, or 1 if it's empty  and is to work around copyIndex erroring when it's 0, even if it's in a conditional block."
+      },
+      "copy": {
+        "name": "keyvaultReadAccessCopy",
+        "count": "[variables('defaultKeyVaultReadAccessHack')]",
+        "mode": "Serial",
+        "batchSize": 1
+      }
+    },
+    {
+      "name": "[concat('sharedKeyVaultDefaultWriteAccessPolicy-', copyIndex())]",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[greater(length(parameters('defaultKeyVaultWriteAccess')), 0)]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('monDevOpsTemplatesUrl'),'/KeyVault/keyvault-access-policy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "servicePrincipalObjectId": {
+            "value": "[parameters('defaultKeyVaultWriteAccess')[copyIndex()]]"
+          },
+          "secretPermissions": {
+            "value": [
+              "set",
+              "delete",
+              "purge"
+            ]
+          },
+          "certificatePermissions": {
+            "value": [
+              "create",
+              "update",
+              "setissuers"
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "sharedKeyVault",
+        "keyvaultReadAccessCopy"
+      ],
+      "metadata": {
+        "description": "The count parameter in copy block is populated with either the length of the certificateWriteAccess parameter, or 1 if it's empty  and is to work around copyIndex erroring when it's 0, even if it's in a conditional block."
+      },
+      "copy": {
+        "name": "defaultKeyVaultWriteAccessCopy",
+        "count": "[variables('defaultKeyVaultWriteAccessHack')]",
+        "mode": "Serial",
+        "batchSize": 1
+      }
+    }
+  ],
+  "outputs": {
+    "keyVaultName": {
+      "type": "string",
+      "value": "[variables('keyVaultName')]"
+    },
+    "KeyVaultUri": {
+      "type": "string",
+      "value": "[reference('sharedKeyVault','2017-05-10').outputs.KeyVaultUri.value]"
+    }
+  }
+}

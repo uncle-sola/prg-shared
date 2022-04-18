@@ -1,0 +1,160 @@
+# prg-shared pipeline
+# contains release stages that have a condition set to false (so they never run)
+# these can be enabled again when YAML releases are production ready 
+
+variables:
+- name: SolutionBaseName
+  value: Mon.Shared
+
+resources:
+  repositories:
+  - repository: self
+  - repository: prg-devops
+    type: github
+    name: olusola-adio/prg-devops
+    endpoint: 'olusola-adio'
+    ref: refs/tags/v1.11.2
+
+pr:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: windows-latest
+
+stages:
+- stage: Build
+  jobs:
+  - job: TestAndPublish
+    variables:
+      - group: 'KeyVault - prg-dev-shared-kv'
+      - group: prg-shared-infrastructure-dev
+    steps:
+    # ARM template
+    #- script: md Templates
+    - template: AzureDevOpsTemplates/Build/StepTemplates/prg-arm-build.yml@prg-devops
+      parameters:
+        ArmTemplateRoot: '$(System.DefaultWorkingDirectory)\Resources'
+        SolutionBaseName: $(SolutionBaseName)
+        TokenizeTestParameters: true
+    - task: CopyFiles@2
+      displayName: 'Copy PSScripts Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        Contents: 'PSScripts/**/*.ps1'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/Resources/PSScripts'
+        flattenFolders: true
+    - task: PublishPipelineArtifact@0
+      displayName: Publish PSScripts Pipeline Artifact
+      inputs:
+        targetPath: $(Build.ArtifactStagingDirectory)/Resources/PSScripts
+        artifactName: Mon.Shared.Resources.PSScripts
+    - task: PublishPipelineArtifact@0
+      displayName: Publish AksManifests Pipeline Artifact
+      inputs:
+        targetPath: Resources/AksManifests
+        artifactName: Mon.Shared.Resources.AksManifests
+
+
+- stage: DeployTo_DEV
+  condition: false
+  variables:
+  - group: prg-shared-all
+  - group: prg-shared-infrastructure-all
+  - template: VariableTemplates\SharedEnvironmentVariables.yml
+  - group: 'KeyVault - prg-dev-shared-kv'
+  - group: prg-shared-dev
+  - group: prg-aks-all
+  - group: prg-shared-infrastructure-dev
+  - group: prg-cds-dev
+  - template: VariableTemplates\DevEnvironmentVariables.yml
+  jobs:
+  - template: JobTemplates\Deploy.yml
+    parameters:
+      AzureSubscription: 'mon(cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224)'
+      AcrResourceGroup: $(ACRResourceGroup)
+      AksAdClientApplicationName: $(AksAdClientApplicationName)
+      AksAdServerApplicationName: $(AksAdServerApplicationName)
+      AksNodeResourceGroupName: $(AksNodeResourceGroupName)
+      AksServiceName: $(sharedAksCluster)
+      AksServicePrincipalName: $(AksServicePrincipalName)
+      CertificateIssuerAccountId: $(CertificateIssuerAccountId)
+      CertificateIssuerAdministratorPhoneNumber: $(CertificateIssuerAdministratorPhoneNumber)
+      CertificateIssuerPassword: $(CertificateIssuerPassword)
+      envAbbreviation: ${{ variables.envAbbreviation }}
+      Environment: 'DEV_SHARED'
+      EnvironmentTag: ${{ variables.EnvironmentTag }}
+      ResourceGroup: ${{ variables.resourceGroup }}
+      ParentBusinessTag: ${{ variables.ParentBusinessTag }}
+      ServiceOfferingTag: ${{ variables.ServiceOfferingTag }}
+      SharedKeyVaultName: $(sharedKeyVaultName)
+      SharedPrefix: ${{ variables.sharedPrefix }}
+      StorageAccountName: $(sharedDfcStorageAccountName)
+
+# - stage: DeployTo_SIT
+#   condition: false
+#   variables:
+#   - group: prg-shared-all
+#   - group: prg-shared-infrastructure-all
+#   - template: VariableTemplates\SharedEnvironmentVariables.yml
+#   - group: 'KeyVault - prg-sit-shared-kv'
+#   - group: prg-shared-sit
+#   - group: prg-shared-infrastructure-sit
+#   - group: prg-cds-sit
+#   - template: VariableTemplates\SitEnvironmentVariables.yml
+#   jobs:
+#   - template: JobTemplates\Deploy.yml
+#     parameters:
+#       AzureSubscription: 'mon(cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224)'
+#       AcrResourceGroup: $(ACRResourceGroup)
+#       AksAdClientApplicationName: $(AksAdClientApplicationName)
+#       AksAdServerApplicationName: $(AksAdServerApplicationName)
+#       AksNodeResourceGroupName: $(AksNodeResourceGroupName)
+#       AksServiceName: $(sharedAksCluster)
+#       AksServicePrincipalName: $(AksServicePrincipalName)
+#       CertificateIssuerAccountId: $(CertificateIssuerAccountId)
+#       CertificateIssuerAdministratorPhoneNumber: $(CertificateIssuerAdministratorPhoneNumber)
+#       CertificateIssuerPassword: $(CertificateIssuerPassword)
+#       envAbbreviation: ${{ variables.envAbbreviation }}
+#       Environment: 'SIT_SHARED'
+#       EnvironmentTag: ${{ variables.EnvironmentTag }}
+#       ResourceGroup: ${{ variables.resourceGroup }}
+#       ParentBusinessTag: ${{ variables.ParentBusinessTag }}
+#       ServiceOfferingTag: ${{ variables.ServiceOfferingTag }}
+#       SharedKeyVaultName: $(sharedKeyVaultName)
+#       SharedPrefix: ${{ variables.sharedPrefix }}
+#       StorageAccountName: $(sharedDfcStorageAccountName)
+
+# - stage: DeployTo_LAB
+  # condition: false
+  # variables:
+  # - group: prg-shared-all
+  # - group: prg-shared-infrastructure-all
+  # - template: VariableTemplates\SharedEnvironmentVariables.yml
+  # - group: 'KeyVault - prg-lab-shared-kv'
+  # - group: prg-shared-lab
+  # - group: prg-shared-infrastructure-lab
+  # - group: prg-cds-dev # this mimics the configuration in the classic release definition
+  # - template: VariableTemplates\LabEnvironmentVariables.yml
+  # jobs:
+  # - template: JobTemplates\Deploy.yml
+  #   parameters:
+  #     AzureSubscription: 'mon(cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224)'
+  #     AcrResourceGroup: $(ACRResourceGroup)
+  #     AksAdClientApplicationName: $(AksAdClientApplicationName)
+  #     AksAdServerApplicationName: $(AksAdServerApplicationName)
+  #     AksNodeResourceGroupName: $(AksNodeResourceGroupName)
+  #     AksServiceName: $(sharedAksCluster)
+  #     AksServicePrincipalName: $(AksServicePrincipalName)
+  #     CertificateIssuerAccountId: $(CertificateIssuerAccountId)
+  #     CertificateIssuerAdministratorPhoneNumber: $(CertificateIssuerAdministratorPhoneNumber)
+  #     CertificateIssuerPassword: $(CertificateIssuerPassword)
+  #     envAbbreviation: ${{ variables.envAbbreviation }}
+  #     Environment: 'LAB_SHARED'
+  #     EnvironmentTag: ${{ variables.EnvironmentTag }}
+  #     ResourceGroup: ${{ variables.resourceGroup }}
+  #     ParentBusinessTag: ${{ variables.ParentBusinessTag }}
+  #     ServiceOfferingTag: ${{ variables.ServiceOfferingTag }}
+  #     SharedKeyVaultName: $(sharedKeyVaultName)
+  #     SharedPrefix: ${{ variables.sharedPrefix }}
+  #     StorageAccountName: $(sharedDfcStorageAccountName)

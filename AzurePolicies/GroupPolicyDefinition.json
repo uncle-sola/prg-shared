@@ -1,0 +1,61 @@
+{
+    "properties": {
+      "displayName": "TagDefinition2",
+      "policyType": "Custom",
+      "mode": "All",
+      "metadata": {
+        "category": "CustomTags",
+        "createdBy": "be898c5a-fb9c-47cb-9714-b34855af96e9",
+        "createdOn": "2020-08-07T16:49:46.5503423Z",
+        "updatedBy": null,
+        "updatedOn": null
+      },
+      "parameters": {},
+      "policyRule": {
+        "if": {
+          "anyOf": [
+            {
+              "field": "tags['Environment']",
+              "notEquals": "[resourceGroup().tags['Environment']]"
+            },
+            {
+              "field": "tags['Parent Business']",
+              "notEquals": "[resourceGroup().tags['Parent Business']]"
+            },
+            {
+              "field": "tags['Service Offering']",
+              "notEquals": "[resourceGroup().tags['Service Offering']]"
+            }
+          ]
+        },
+        "then": {
+          "effect": "modify",
+          "details": {
+            "roleDefinitionIds": [
+              "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+            ],
+            "operations": [
+              {
+                "operation": "addOrReplace",
+                "field": "tags['Environment']",
+                "value": "[resourceGroup().tags['Environment']]"
+              },
+              {
+                "operation": "addOrReplace",
+                "field": "tags['Parent Business']",
+                "value": "[resourceGroup().tags['Parent Business']]"
+              },
+              {
+                "operation": "addOrReplace",
+                "field": "tags['Service Offering']",
+                "value": "[resourceGroup().tags['Service Offering']]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "id": "/subscriptions/cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224/providers/Microsoft.Authorization/policyDefinitions/02ad3069-20f4-4ad1-9e4a-a7b13a048fc5",
+    "type": "Microsoft.Authorization/policyDefinitions",
+    "name": "02ad3069-20f4-4ad1-9e4a-a7b13a048fc5"
+  }

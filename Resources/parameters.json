@@ -1,0 +1,57 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sharedPrefix": {
+      "value": "__sharedPrefix__"
+    },
+    "aksAgentVmSize": {
+      "value": "__AksAgentVmSize__"
+    },
+    "aksAgentNodeCount": {
+      "value": __AksAgentNodeCount__
+    },
+    "aksDnsServiceIp": {
+      "value": "__AksDnsServiceIp__"
+    },
+    "aksKubernetesVersion": {
+      "value": "__AksKubernetesVersion__"
+    },
+    "aksNodeResourceGroupName": {
+      "value": "__AksNodeResourceGroupName__"
+    },
+    "aksRbacTenantId": {
+      "value": "__AksRbacTenantId__"
+    },
+    "aksRouteTableName": {
+      "value": "__AksRouteTableName__"
+    },
+    "aksServiceCidr": {
+      "value": "__AksServiceCidr__"
+    },
+    "aksSubnetName": {
+      "value": "__AksSubnetName__"
+    },
+    "aksVirtualNetworkAddressPrefix": {
+      "value": "__AksVirtualNetworkAddressPrefix__"
+    },
+    "aksVnetName": {
+      "value": "__AksVnetName__"
+    },
+    "aksVnetResourceGroupName": {
+      "value": "__AksVnetResourceGroupName__"
+    },
+    "aksAppGatewaySubnetName": {
+      "value": "__aksAppGatewaySubnetName__"
+    },
+    "defaultKeyVaultReadAccess": {
+      "value": __defaultKeyVaultReadAccess__
+    },
+    "defaultKeyVaultWriteAccess": {
+      "value": __certificateKeyVaultWriteAccess__
+    },
+    "aadProfileAdminGroupObjectIDs": {
+      "value": __aadProfileAdminGroupObjectIDs__
+    }
+  }
+}
