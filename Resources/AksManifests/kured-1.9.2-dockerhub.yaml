@@ -120,7 +120,7 @@ spec:
 #            - --prometheus-url=http://prometheus.monitoring.svc.cluster.local
 #            - --reboot-days=sun,mon,tue,wed,thu,fri,sat
 #            - --reboot-sentinel=/var/run/reboot-required
-            - --slack-hook-url=__MonDevOpsAlertsSlackHook__
+            - --slack-hook-url=__PrgDevOpsAlertsSlackHook__
 #            - --slack-username=prod
 #            - --slack-channel=alerting
 #            - --start-time=0:00

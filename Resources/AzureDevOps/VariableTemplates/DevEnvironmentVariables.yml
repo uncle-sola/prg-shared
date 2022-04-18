@@ -3,8 +3,6 @@
 variables:
 - name: envAbbreviation
   value: dev
-- name: EnvironmentTag
-  value: Dev/Test
 - name: envType
   value: dev
 - name: sharedPrefix
@@ -24,7 +22,7 @@ variables:
 - name: ReleaseEnvironmentName
   value: DEV
 - name: ACRResourceGroup
-  value: prg-dev-app-sharedresources-rg
+  value: prg-$(envType)-app-sharedresources-rg
 - name: AksDnsServiceIp
   value: 10.2.5.10
 - name: AksKubernetesVersion
@@ -45,3 +43,30 @@ variables:
   value: 2
 - name: resourceGroup
   value: $(sharedPrefix)-rg
+- name: AksAadGroupObjectId
+  value: 8c1dfbfb-72c3-4251-a99b-4162199499d8
+- name: AksAadAdminGroupName
+  value: PRG AKS ADM DEV
+- name: AksAdminUserObjectIds
+  value: cd7d7911-5261-48ea-9c8a-4472c8909219
+- name: AksPodReaderGroupObjectId
+  value: 53fe00bb-f025-43cf-846c-55cf9c0c9450
+- name: AzureDevOpsUrl
+  value: https://dev.azure.com/prg-cloud/
+- name: AzureSubscriptionId
+  value: f3b14109-a3de-4f54-9f58-46d891380a7e
+- name: functionKey
+  value: 
+- name: keyVaultName
+  value: $(sharedPrefix)-kv
+- name: ParentBusinessTag
+  value: Karis Ministries
+- name: ServiceOfferingTag
+  value: Karis Ministries Services
+- name: EnvironmentTag
+  value: Dev/Test
+- name: sharedAksCluster
+  value: $(sharedPrefix)-aks
+- name: ContainerRegistryAdminUser
+  value: prgdevappsharedcr
+
