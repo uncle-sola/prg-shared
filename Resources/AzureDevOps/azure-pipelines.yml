@@ -27,7 +27,8 @@ stages:
 - stage: Build
   jobs:
   - job: TestAndPublish
-    # variables:
+    variables:
+    - template: VariableTemplates\DevEnvironmentVariables.yml
     #   - group: 'KeyVault - prg-dev-shared-kv'
     #   - group: prg-shared-infrastructure-dev
     steps:
