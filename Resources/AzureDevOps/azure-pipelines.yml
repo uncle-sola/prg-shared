@@ -61,7 +61,7 @@ stages:
   jobs:
   - template: JobTemplates\Deploy.yml
     parameters:
-      AzureSubscription: $(AzureSubscriptionId)
+      AzureSubscription: 'prg (f3b14109-a3de-4f54-9f58-46d891380a7e)'
       AcrResourceGroup: $(ACRResourceGroup)
       Environment: 'DEV_SHARED'
       EnvironmentTag: $(EnvironmentTag)
