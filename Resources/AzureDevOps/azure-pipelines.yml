@@ -58,6 +58,7 @@ stages:
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   variables:
   - template: VariableTemplates\DevEnvironmentVariables.yml
+  - group: prg-aks-dev
   jobs:
   - template: JobTemplates\Deploy.yml
     parameters:

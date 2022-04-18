@@ -69,7 +69,3 @@ variables:
   value: $(sharedPrefix)-aks
 - name: ContainerRegistryAdminUser
   value: prgdevappsharedcr
-- name: defaultKeyVaultReadAccess
-  value: [f5aaf02f-7df9-4915-9379-de6d0dee2d6a,8c1dfbfb-72c3-4251-a99b-4162199499d8]
-- name: certificateKeyVaultWriteAccess
-  value: [f5aaf02f-7df9-4915-9379-de6d0dee2d6a,8c1dfbfb-72c3-4251-a99b-4162199499d8]
