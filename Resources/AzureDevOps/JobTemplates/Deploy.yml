@@ -82,7 +82,7 @@ jobs:
           displayName: 'Assign AcrPull to prg-$(envAbbreviation)-shared-aks'
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
-            ScriptPath: '$(System.DefaultWorkingDirectory)/prg-shared/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
+            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
             ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks" -RoleDefinitionName "AcrPull" -Verbose'
             azurePowerShellVersion: LatestVersion
 
@@ -90,7 +90,7 @@ jobs:
           displayName: 'Assign AcrPull to prg-$(envAbbreviation)-shared-aks-agentpool'
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
-            ScriptPath: '$(System.DefaultWorkingDirectory)/prg-shared/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
+            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
             ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks-agentpool" -RoleDefinitionName "AcrPull" -Verbose'
             azurePowerShellVersion: LatestVersion
 
@@ -98,9 +98,40 @@ jobs:
           displayName: 'Convert ARM Outputs to variables'
           inputs:
             targetType: filePath
-            filePath: '$(System.DefaultWorkingDirectory)/prg-devops/PSScripts/ConvertTo-VSTSVariables.ps1'
+            filePath: ' $(Build.SourcesDirectory)/PSScripts/ConvertTo-VSTSVariables.ps1'
             arguments: '-ARMOutput $(ARMOutputs)'
 
+        - task: AzurePowerShell@4
+          displayName: 'Store Registry Password in keyvault'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Add-ContainerRegistryKeyToVault.ps1'
+            ScriptArguments: '-ContainerResourceGroupName $(appSharedResourceGroup) -KeyVaultResourceGroupName $(ResourceGroup) -ContainerRegistryName $(ContainerRegistryAdminUser) -KeyVaultName $(sharedPrefix)-kv -KeyName ContainerRegistryPassword'
+            azurePowerShellVersion: LatestVersion
+
+        - task: AzureCLI@2
+          displayName: 'Azure CLI script: Output-AksAvailableUpgrades'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            scriptType: ps
+            scriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Output-AksAvailableUpgrades.ps1'
+            arguments: '-AksResourceGroup $(resourceGroup) -AksServiceName $(AksServiceName) -Verbose'
+
+        - task: AzureCLI@2
+          displayName: 'Azure CLI Script Output-FunctionKey'
+          inputs:
+            azureSubscription:  '${{ parameters.AzureSubscription }}'
+            scriptType: ps
+            scriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Output-FunctionKey.ps1'
+            arguments: '-AzureSubscriptionId $(AzureSubscriptionId) -ResourceGroup $(appSharedResourceGroup) -FunctionAppName $(sharedFunctionAppName) -Verbose'            
+
+        - task: AzurePowerShell@4
+          displayName: 'Azure PowerShell script: Test-AksAvailableUpgrades'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Test-AksAvailableUpgrades.ps1'
+            ScriptArguments: '-GenerallyAvailableUpgradesCount $(GenerallyAvailableUpgradesCount) -Verbose'
+            azurePowerShellVersion: LatestVersion
 
         # Create AKS service principals
         # - task: AzurePowerShell@3

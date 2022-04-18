@@ -49,5 +49,9 @@ variables:
   value: $(sharedPrefix)-aks
 - name: ContainerRegistryAdminUser
   value: prgdevappsharedcr
+- name: appSharedPrefix
+  value: prg-$(envAbbreviation)-app-sharedresources
 - name: appSharedResourceGroup
-  value: prg-$(envType)-app-sharedresources-rg
+  value: $(appSharedPrefix)-rg
+- name: sharedFunctionAppName
+  value: $(appSharedPrefix)-mon-fa
