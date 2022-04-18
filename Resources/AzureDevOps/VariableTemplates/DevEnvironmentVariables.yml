@@ -1,8 +1,6 @@
 # NOTE: This file is used to hold variables that are specific to the DEV environment of the prg-shared pipeline.  
 # Variables that will be shared across multiple pipelines should be stored in Azure DevOps variable libraries
 variables:
-- name: apimHostnameRoot
-  value: api.nationalcareersservice.org.uk
 - name: envAbbreviation
   value: dev
 - name: EnvironmentTag
@@ -25,3 +23,23 @@ variables:
   value: $(resourceGroup)
 - name: ReleaseEnvironmentName
   value: DEV
+- name: ACRResourceGroup
+  value: prg-dev-app-sharedresources-rg
+- name: AksDnsServiceIp
+  value: 10.2.5.10
+- name: AksKubernetesVersion
+  value: 1.22.4
+- name: AksRbacTenantId
+  value: 893c6ab5-5aae-4706-be15-dc729e4f10e8
+- name: AksRouteTableName
+  value: aks-agentpool-42472566-routetable
+- name: AksServiceCidr
+  value: 10.2.5.0/24
+- name: aksAppGatewayNetworkSecurityGroup
+  value: prg-aks-ag-nsg
+- name: aksAppGatewaySubnetName
+  value: prg-aks-ag-01
+- name: AksServiceName
+  value: $(sharedPrefix)-aks
+- name: aksAgentNodeCount
+  value: 2

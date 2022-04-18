@@ -27,9 +27,9 @@ stages:
 - stage: Build
   jobs:
   - job: TestAndPublish
-    variables:
-      - group: 'KeyVault - prg-dev-shared-kv'
-      - group: prg-shared-infrastructure-dev
+    # variables:
+    #   - group: 'KeyVault - prg-dev-shared-kv'
+    #   - group: prg-shared-infrastructure-dev
     steps:
     # ARM template
     #- script: md Templates
