@@ -55,6 +55,29 @@ jobs:
             ScriptArguments: '-ResourceGroupName "${{ parameters.ResourceGroup }}" -Location "${{  parameters.Location  }}" -Environment "${{ parameters.EnvironmentTag }}" -ParentBusiness "${{ parameters.ParentBusinessTag }}" -ServiceOffering "${{ parameters.ServiceOfferingTag }}" -Verbose'
             azurePowerShellVersion: LatestVersion
 
+        - task: Tokenization@2 
+          displayName: 'Tokenization: Transform file parameters.json'
+          inputs:
+            SourcePath: '${{ parameters.ArmTemplateFolder }}'
+            TargetFileNames: parameters.json
+
+        - task: AzureResourceGroupDeployment@2
+          displayName: 'Azure Deployment:Create Or Update Resource Group action on ${{ parameters.ResourceGroup }}'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            resourceGroupName: '${{ parameters.ResourceGroup }}'
+            location: '${{ parameters.Location }}'
+            csmFile: '${{ parameters.ArmTemplateFolder }}/template.json'
+            csmParametersFile: '${{ parameters.ArmTemplateFolder }}/parameters.json'
+            deploymentOutputs: '$(ArmOutputVariableName)'
+
+        - task: DeleteFiles@1
+          displayName: 'Delete tokenised parameters.json file'
+          inputs:
+            SourceFolder: '${{ parameters.ArmTemplateFolder }}'
+            Contents: parameters.json
+          condition: always()
+
 
         # Create AKS service principals
         # - task: AzurePowerShell@3

@@ -71,6 +71,8 @@ stages:
       SharedKeyVaultName: $(keyVaultName)
       SharedPrefix: $(sharedPrefix)
       EnvAbbreviation: $(envAbbreviation)
+      ArmTemplateFolder: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.Resources.ArmTemplates/"
+
 
 # - stage: DeployTo_SIT
 #   condition: false
