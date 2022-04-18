@@ -51,7 +51,7 @@
       "value": __certificateKeyVaultWriteAccess__
     },
     "aadProfileAdminGroupObjectIDs": {
-      "value": __AksAadGroupObjectId__
+      "value": __aadProfileAdminGroupObjectIDs__
     }
   }
 }
