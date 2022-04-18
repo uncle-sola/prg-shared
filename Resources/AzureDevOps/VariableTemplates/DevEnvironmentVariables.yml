@@ -7,8 +7,6 @@ variables:
   value: dev
 - name: sharedPrefix
   value: prg-$(envAbbreviation)-shared
-- name: AksAgentVmSize
-  value: Standard_B2s
 - name: AksNodeResourceGroupName
   value: $(sharedPrefix)-aksnodes-rg
 - name: AksSubnetName
@@ -25,10 +23,6 @@ variables:
   value: prg-$(envType)-app-sharedresources-rg
 - name: AksDnsServiceIp
   value: 10.2.5.10
-- name: AksKubernetesVersion
-  value: 1.22.4
-- name: AksRouteTableName
-  value: aks-agentpool-42472566-routetable
 - name: AksServiceCidr
   value: 10.2.5.0/24
 - name: aksAppGatewayNetworkSecurityGroup
@@ -37,16 +31,12 @@ variables:
   value: prg-aks-ag-01
 - name: AksServiceName
   value: $(sharedPrefix)-aks
-- name: aksAgentNodeCount
-  value: 2
 - name: resourceGroup
   value: $(sharedPrefix)-rg
 - name: AksAadAdminGroupName
   value: PRG AKS ADM DEV
 - name: AzureDevOpsUrl
   value: https://dev.azure.com/prg-cloud/
-- name: functionKey
-  value: 
 - name: keyVaultName
   value: $(sharedPrefix)-kv
 - name: ParentBusinessTag
