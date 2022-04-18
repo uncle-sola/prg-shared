@@ -4,7 +4,7 @@
 
 variables:
 - name: SolutionBaseName
-  value: Mon.Shared
+  value: Prg.Shared
 
 resources:
   repositories:
@@ -54,7 +54,7 @@ stages:
 
 
 
-- stage: DeployTo_DEV
+- stage: Deploy_To_DEV
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   variables:
   - template: VariableTemplates\DevEnvironmentVariables.yml

@@ -12,7 +12,7 @@ parameters:
 
 
 jobs:
-- deployment: DeployTo_${{ parameters.Environment }}
+- deployment: Deploy_To_${{ parameters.Environment }}
   environment: ${{ parameters.Environment }}
   strategy:
     runOnce:

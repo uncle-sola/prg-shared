@@ -54,7 +54,7 @@ variables:
 - name: AzureDevOpsUrl
   value: https://dev.azure.com/prg-cloud/
 - name: AzureSubscriptionId
-  value: prg (f3b14109-a3de-4f54-9f58-46d891380a7e)
+  value: f3b14109-a3de-4f54-9f58-46d891380a7e
 - name: functionKey
   value: 
 - name: keyVaultName
