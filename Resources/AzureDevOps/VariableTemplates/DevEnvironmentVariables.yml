@@ -44,13 +44,13 @@ variables:
 - name: resourceGroup
   value: $(sharedPrefix)-rg
 - name: AksAadGroupObjectId
-  value: 8c1dfbfb-72c3-4251-a99b-4162199499d8
+  value: "8c1dfbfb-72c3-4251-a99b-4162199499d8"
 - name: AksAadAdminGroupName
   value: PRG AKS ADM DEV
 - name: AksAdminUserObjectIds
-  value: cd7d7911-5261-48ea-9c8a-4472c8909219
+  value: "cd7d7911-5261-48ea-9c8a-4472c8909219"
 - name: AksPodReaderGroupObjectId
-  value: 53fe00bb-f025-43cf-846c-55cf9c0c9450
+  value: "53fe00bb-f025-43cf-846c-55cf9c0c9450"
 - name: AzureDevOpsUrl
   value: https://dev.azure.com/prg-cloud/
 - name: AzureSubscriptionId
@@ -69,4 +69,8 @@ variables:
   value: $(sharedPrefix)-aks
 - name: ContainerRegistryAdminUser
   value: prgdevappsharedcr
+- name: defaultKeyVaultReadAccess
+  value: ["f5aaf02f-7df9-4915-9379-de6d0dee2d6a","8c1dfbfb-72c3-4251-a99b-4162199499d8"]
+- name: certificateKeyVaultWriteAccess
+  value: ["f5aaf02f-7df9-4915-9379-de6d0dee2d6a","8c1dfbfb-72c3-4251-a99b-4162199499d8"]
 
