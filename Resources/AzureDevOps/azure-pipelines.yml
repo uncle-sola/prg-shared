@@ -11,8 +11,8 @@ resources:
   - repository: self
   - repository: prg-devops
     type: github
-    name: olusola-adio/prg-devops
-    endpoint: 'olusola-adio'
+    name: uncle-sola/prg-devops
+    endpoint: 'uncle-sola'
     ref: refs/tags/v1.11.2
 
 pr:
