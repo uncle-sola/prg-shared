@@ -43,3 +43,5 @@ variables:
   value: $(sharedPrefix)-aks
 - name: aksAgentNodeCount
   value: 2
+- name: resourceGroup
+  value: $(sharedPrefix)-rg

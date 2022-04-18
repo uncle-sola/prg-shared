@@ -29,11 +29,7 @@ stages:
   - job: TestAndPublish
     variables:
     - template: VariableTemplates\DevEnvironmentVariables.yml
-    #   - group: 'KeyVault - prg-dev-shared-kv'
-    #   - group: prg-shared-infrastructure-dev
     steps:
-    # ARM template
-    #- script: md Templates
     - template: AzureDevOpsTemplates/Build/StepTemplates/prg-arm-build.yml@prg-devops
       parameters:
         ArmTemplateRoot: '$(System.DefaultWorkingDirectory)\Resources'
@@ -45,16 +41,17 @@ stages:
         Contents: 'PSScripts/**/*.ps1'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/Resources/PSScripts'
         flattenFolders: true
-    - task: PublishPipelineArtifact@0
+    - task: PublishPipelineArtifact@1
       displayName: Publish PSScripts Pipeline Artifact
       inputs:
         targetPath: $(Build.ArtifactStagingDirectory)/Resources/PSScripts
-        artifactName: Mon.Shared.Resources.PSScripts
-    - task: PublishPipelineArtifact@0
+        artifact: Prg.Shared.Resources.PSScripts        
+    - task: PublishPipelineArtifact@1
       displayName: Publish AksManifests Pipeline Artifact
       inputs:
         targetPath: Resources/AksManifests
-        artifactName: Mon.Shared.Resources.AksManifests
+        artifact: Prg.Shared.Resources.AksManifests        
+
 
 
 # - stage: DeployTo_DEV
