@@ -14,8 +14,6 @@ parameters:
   Location: 'West Europe'
   ArmTemplateFolder: ''
 
-
-
 jobs:
 - deployment: Deploy_To_${{ parameters.Environment }}
   environment: ${{ parameters.Environment }}
@@ -98,13 +96,6 @@ jobs:
             ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks-agentpool" -RoleDefinitionName "AcrPull" -Verbose'
             azurePowerShellVersion: LatestVersion
 
-        - task: PowerShell@2
-          displayName: 'Convert ARM Outputs to variables'
-          inputs:
-            targetType: filePath
-            filePath: '$(Build.SourcesDirectory)/PSScripts/ConvertTo-VSTSVariables.ps1'
-            arguments: '-ARMOutput ''$(ARMOutputs)'' '
-
         - task: AzurePowerShell@4
           displayName: 'Store Registry Password in keyvault'
           inputs:
@@ -136,6 +127,65 @@ jobs:
             ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Test-AksAvailableUpgrades.ps1'
             ScriptArguments: '-GenerallyAvailableUpgradesCount $(GenerallyAvailableUpgradesCount) -Verbose'
             azurePowerShellVersion: LatestVersion
+
+        - task: Kubernetes@1
+          displayName: 'kubectl create kured namespace'
+          inputs:
+            connectionType: 'Azure Resource Manager'
+            azureSubscriptionEndpoint: '${{ parameters.AzureSubscription }}'
+            azureResourceGroup: '$(resourceGroup)'
+            kubernetesCluster: '$(aksServiceName)'
+            useClusterAdmin: true
+            namespace: default
+            command: apply
+            arguments: '--filename=$(Pipeline.Workspace)/Prg.Shared.Resources.AksManifests/create-namespace.yaml'
+            versionSpec: $(AksKubernetesVersion)            
+
+        - task: Tokenization@2
+          displayName: 'Tokenization: Transform file kured-1.9.2-dockerhub.yaml'
+          inputs:
+            SourcePath: '$(Pipeline.Workspace)/Prg.Shared.Resources.AksManifests'
+            TargetFileNames: 'kured-1.9.2-dockerhub.yaml'
+
+        - task: Kubernetes@1
+          displayName: 'kubectl deploy kured daemonset'
+          inputs:
+            connectionType: 'Azure Resource Manager'
+            azureSubscriptionEndpoint: '${{ parameters.AzureSubscription }}'
+            azureResourceGroup: '$(resourceGroup)'
+            kubernetesCluster: '$(aksServiceName)'
+            useClusterAdmin: true
+            namespace: 'kured-ns'
+            command: apply
+            arguments: '--filename=$(Pipeline.Workspace)/Prg.Shared.Resources.AksManifests/kured-1.9.2-dockerhub.yaml'
+            versionSpec: $(AksKubernetesVersion) 
+
+        - task: AzurePowerShell@4
+          displayName: 'Azure PowerShell script: Set-AksAadGroup'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Set-AksAadGroup.ps1'
+            ScriptArguments: '-AksAadGroupName "$(AksAadAdminGroupName)" -UsersToAdd @($(AksAdminUserObjectIds))'
+            azurePowerShellVersion: LatestVersion
+
+        - task: Tokenization@2
+          displayName: 'Tokenization: Transform file rbac.aadgroup.pod-reader.yaml'
+          inputs:
+            SourcePath: '$(Pipeline.Workspace)/Prg.Shared.Resources.AksManifests'
+            TargetFileNames: 'rbac.aadgroup.pod-reader.yaml'
+
+        - task: Kubernetes@1
+          displayName: 'kubectl apply rbac.aadgroup.pod-reader.yaml'
+          inputs:
+            connectionType: 'Azure Resource Manager'
+            azureSubscriptionEndpoint: '${{ parameters.AzureSubscription }}'
+            azureResourceGroup: '$(resourceGroup)'
+            kubernetesCluster: '$(aksServiceName)'
+            useClusterAdmin: true
+            namespace: default
+            command: apply
+            arguments: '--filename=$(Pipeline.Workspace)/Prg.Shared.Resources.AksManifests/rbac.aadgroup.pod-reader.yaml'
+            versionSpec: $(AksKubernetesVersion)            
 
         # Create AKS service principals
         # - task: AzurePowerShell@3
