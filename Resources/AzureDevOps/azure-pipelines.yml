@@ -65,15 +65,7 @@ stages:
   - template: JobTemplates\Deploy.yml
     parameters:
       AzureSubscription: 'prg (f3b14109-a3de-4f54-9f58-46d891380a7e)'
-      AcrResourceGroup: $(ACRResourceGroup)
       Environment: 'DEV_SHARED'
-      EnvironmentTag: $(EnvironmentTag)
-      ResourceGroup: '$(sharedPrefix)-rg'
-      ParentBusinessTag: $(ParentBusinessTag)
-      ServiceOfferingTag: $(ServiceOfferingTag)
-      SharedKeyVaultName: $(keyVaultName)
-      SharedPrefix: $(sharedPrefix)
-      EnvAbbreviation: $(envAbbreviation)
       ArmTemplateFolder: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.Resources.ArmTemplates/"
 
 

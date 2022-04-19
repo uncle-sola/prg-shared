@@ -1,14 +1,6 @@
 parameters:
   AzureSubscription: ''
-  AcrResourceGroup: ''
   Environment: ''
-  EnvironmentTag: ''
-  ResourceGroup: ''
-  ParentBusinessTag: ''
-  ServiceOfferingTag: ''
-  SharedKeyVaultName: ''
-  SharedPrefix: ''
-  EnvAbbreviation: ''
   SetTagsScriptFilePath: '$(System.DefaultWorkingDirectory)\Set-EsfaResourceGroupTags.ps1'
   SetEsfaResourceGroupTagsScript: 'https://raw.githubusercontent.com/uncle-sola/prg-devops/master/PSScripts/Set-EsfaResourceGroupTags.ps1'
   Location: 'West Europe'
@@ -21,13 +13,6 @@ jobs:
     runOnce:
       deploy:
         steps:
-        - task: AzurePowerShell@3
-          displayName: 'Azure PowerShell script: Set-ArmParameters'
-          inputs:
-            azureSubscription: ${{ parameters.AzureSubscription }}
-            ScriptPath:  '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Set-ArmParameters.ps1'
-            ScriptArguments: '-Environment "${{ parameters.EnvAbbreviation }}" -Verbose'
-            azurePowerShellVersion: LatestVersion
         - checkout: prg-devops
           path: 's/prg-devops/'
         - script: dir $(Build.SourcesDirectory)
@@ -54,7 +39,7 @@ jobs:
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
             ScriptPath: ${{ parameters.SetTagsScriptFilePath }}
-            ScriptArguments: '-ResourceGroupName "${{ parameters.ResourceGroup }}" -Location "${{  parameters.Location  }}" -Environment "${{ parameters.EnvironmentTag }}" -ParentBusiness "${{ parameters.ParentBusinessTag }}" -ServiceOffering "${{ parameters.ServiceOfferingTag }}" -Verbose'
+            ScriptArguments: '-ResourceGroupName "$(resourceGroup)" -Location "${{  parameters.Location  }}" -Environment "$(EnvironmentTag)" -ParentBusiness "$(ParentBusinessTag)" -ServiceOffering "$(ServiceOfferingTag)" -Verbose'
             azurePowerShellVersion: LatestVersion
 
         - task: Tokenization@2 
@@ -64,10 +49,10 @@ jobs:
             TargetFileNames: parameters.json
 
         - task: AzureResourceGroupDeployment@2
-          displayName: 'Azure Deployment:Create Or Update Resource Group action on ${{ parameters.ResourceGroup }}'
+          displayName: 'Azure Deployment:Create Or Update Resource Group action on $(resourceGroup)'
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
-            resourceGroupName: '${{ parameters.ResourceGroup }}'
+            resourceGroupName: '$(resourceGroup)'
             location: '${{ parameters.Location }}'
             csmFile: '${{ parameters.ArmTemplateFolder }}/template.json'
             csmParametersFile: '${{ parameters.ArmTemplateFolder }}/parameters.json'
@@ -85,7 +70,7 @@ jobs:
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
             ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
-            ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks" -RoleDefinitionName "AcrPull" -Verbose'
+            ScriptArguments: '-ResourceGroupName $(AcrResourceGroup) -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks" -RoleDefinitionName "AcrPull" -Verbose'
             azurePowerShellVersion: LatestVersion
 
         - task: AzurePowerShell@4
@@ -93,7 +78,7 @@ jobs:
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
             ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Assign-AcrPull-Permissions-To-Identity.ps1'
-            ScriptArguments: '-ResourceGroupName ${{ parameters.AcrResourceGroup }} -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks-agentpool" -RoleDefinitionName "AcrPull" -Verbose'
+            ScriptArguments: '-ResourceGroupName $(AcrResourceGroup) -ServicePrincipalName "prg-$(envAbbreviation)-shared-aks-agentpool" -RoleDefinitionName "AcrPull" -Verbose'
             azurePowerShellVersion: LatestVersion
 
         - task: AzurePowerShell@4
@@ -193,7 +178,7 @@ jobs:
         #   inputs:
         #     azureSubscription: ${{ parameters.AzureSubscription }}
         #     ScriptPath: '$(Pipeline.Workspace)/Dfc.Shared.Resources.PSScripts/New-AksServicePrincipals.ps1'
-        #     ScriptArguments: '-AcrResourceGroup ${{ parameters.AcrResourceGroup }} -AksServicePrincipalName ${{ parameters.AksServicePrincipalName }} -AksAdClientApplicationName ${{ parameters.AksAdClientApplicationName }} -AksAdServerApplicationName ${{ parameters.AksAdServerApplicationName }} -AksResourceGroup ${{ parameters.ResourceGroup }} -MonDevOpsScriptRoot $(Build.SourcesDirectory)\PSScripts -SharedKeyVaultName ${{ parameters.SharedKeyVaultName }} -Verbose'
+        #     ScriptArguments: '-AcrResourceGroup $(AcrResourceGroup) -AksServicePrincipalName ${{ parameters.AksServicePrincipalName }} -AksAdClientApplicationName ${{ parameters.AksAdClientApplicationName }} -AksAdServerApplicationName ${{ parameters.AksAdServerApplicationName }} -AksResourceGroup $(resourceGroup) -MonDevOpsScriptRoot $(Build.SourcesDirectory)\PSScripts -SharedKeyVaultName ${{ parameters.SharedKeyVaultName }} -Verbose'
         #     azurePowerShellVersion: LatestVersion
         # # Create shared configuration table
         # - task: AzurePowerShell@4
@@ -201,7 +186,7 @@ jobs:
         #   inputs:
         #     azureSubscription: ${{ parameters.AzureSubscription }}
         #     ScriptPath: $(Build.SourcesDirectory)/PSScripts/New-TableOnStorageAccount.ps1
-        #     ScriptArguments: '-StorageAccountName ${{ parameters.StorageAccountName }} -ResourceGroupName ${{ parameters.ResourceGroup }} -TableName Configuration'
+        #     ScriptArguments: '-StorageAccountName ${{ parameters.StorageAccountName }} -ResourceGroupName $(resourceGroup) -TableName Configuration'
         #     azurePowerShellVersion: LatestVersion
         # # Deploy ARM template
         # - template: AzureDevOpsTemplates/Deploy/StepTemplates/prg-arm-deploy.yml@prg-devops
@@ -210,7 +195,7 @@ jobs:
         #     AzureSubscription: ${{ parameters.AzureSubscription }}
         #     EnvironmentTag: ${{ parameters.EnvironmentTag }}
         #     ParentBusinessTag: ${{ parameters.ParentBusinessTag }}
-        #     ResourceGroup: ${{ parameters.ResourceGroup }}
+        #     ResourceGroup: $(resourceGroup)
         #     ServiceOfferingTag: ${{ parameters.ServiceOfferingTag }}
         # # Remove unneeded APIM APIs
         # - task: AzurePowerShell@4
@@ -219,7 +204,7 @@ jobs:
         #     azureSubscription: ${{ parameters.AzureSubscription }}
         #     ##TO DO: remove this script from prg-devops when merging this change back to master
         #     ScriptPath: 's/prg-devops/PSScripts/Remove-ApisFromApiManagement.ps1'
-        #     ScriptArguments: '-ApisToRemove @( ${{ parameters.ApimApisToRemove }} ) -ApimResourceGroup "${{ parameters.ResourceGroup }}" -ApimServiceName "${{ parameters.SharedPrefix }}-apim"'
+        #     ScriptArguments: '-ApisToRemove @( ${{ parameters.ApimApisToRemove }} ) -ApimResourceGroup "$(resourceGroup)" -ApimServiceName "${{ parameters.SharedPrefix }}-apim"'
         #     azurePowerShellVersion: LatestVersion
         # # Set KeyVault certificate issuer (OAT, PP & PRD only)
         # - task: AzurePowerShell@4
@@ -237,7 +222,7 @@ jobs:
         #     azureSubscription: '${{ parameters.AzureSubscription }}'
         #     scriptType: ps
         #     scriptPath: '$(Pipeline.Workspace)/Dfc.Shared.Resources.PSScripts/Output-AksAvailableUpgrades.ps1'
-        #     arguments: '-AksResourceGroup ${{ parameters.ResourceGroup }} -AksServiceName ${{ parameters.AksServiceName }} -Verbose'
+        #     arguments: '-AksResourceGroup $(resourceGroup) -AksServiceName ${{ parameters.AksServiceName }} -Verbose'
         # - task: AzurePowerShell@4
         #   displayName: 'Azure PowerShell script: Test-AksAvailableUpgrades'
         #   inputs:
@@ -256,7 +241,7 @@ jobs:
         #   inputs:
         #     connectionType: Azure Resource Manager
         #     azureSubscriptionEndpoint: ${{ parameters.AzureSubscription }}
-        #     azureResourceGroup: ${{ parameters.ResourceGroup }}
+        #     azureResourceGroup: $(resourceGroup)
         #     kubernetesCluster: ${{ parameters.AksServiceName }}
         #     useClusterAdmin: true
         #     namespace: 'kube-system'
