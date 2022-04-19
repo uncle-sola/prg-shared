@@ -27,7 +27,7 @@ param(
     [string]$RoleDefinitionName
 )
 
-$ServicePrincipalObject = Get-AzADServicePrincipal -DisplayName $ServicePrincipalName
+$ServicePrincipalObject = Get-AzADServicePrincipal  -Filter "DisplayName eq '$($ServicePrincipalName)'" 
 
 if ($ServicePrincipalObject) {
     Write-Verbose "Setting Application Id for $($ServicePrincipalName)"
