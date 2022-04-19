@@ -97,6 +97,14 @@ jobs:
             azurePowerShellVersion: LatestVersion
 
         - task: AzurePowerShell@4
+          displayName: 'Azure PowerShell script: Set-AksAadGroup'
+          inputs:
+            azureSubscription: '${{ parameters.AzureSubscription }}'
+            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Set-AksAadGroup.ps1'
+            ScriptArguments: '-AksAadGroupName "$(AksAadAdminGroupName)" -UsersToAdd @($(AksAdminUserObjectIds))'
+            azurePowerShellVersion: LatestVersion            
+
+        - task: AzurePowerShell@4
           displayName: 'Store Registry Password in keyvault'
           inputs:
             azureSubscription: '${{ parameters.AzureSubscription }}'
@@ -159,14 +167,6 @@ jobs:
             command: apply
             arguments: '--filename=$(Pipeline.Workspace)/Prg.Shared.Resources.AksManifests/kured-1.9.2-dockerhub.yaml'
             versionSpec: $(AksKubernetesVersion) 
-
-        - task: AzurePowerShell@4
-          displayName: 'Azure PowerShell script: Set-AksAadGroup'
-          inputs:
-            azureSubscription: '${{ parameters.AzureSubscription }}'
-            ScriptPath: '$(Pipeline.Workspace)/Prg.Shared.Resources.PSScripts/Set-AksAadGroup.ps1'
-            ScriptArguments: '-AksAadGroupName "$(AksAadAdminGroupName)" -UsersToAdd @($(AksAdminUserObjectIds))'
-            azurePowerShellVersion: LatestVersion
 
         - task: Tokenization@2
           displayName: 'Tokenization: Transform file rbac.aadgroup.pod-reader.yaml'
