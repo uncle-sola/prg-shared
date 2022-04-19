@@ -102,8 +102,8 @@ jobs:
           displayName: 'Convert ARM Outputs to variables'
           inputs:
             targetType: filePath
-            filePath: ' $(Build.SourcesDirectory)/PSScripts/ConvertTo-VSTSVariables.ps1'
-            arguments: '-ARMOutput $(ARMOutputs)'
+            filePath: '$(Build.SourcesDirectory)/PSScripts/ConvertTo-VSTSVariables.ps1'
+            arguments: '-ARMOutput ''$(ARMOutputs)'' '
 
         - task: AzurePowerShell@4
           displayName: 'Store Registry Password in keyvault'
