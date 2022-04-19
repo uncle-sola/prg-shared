@@ -48,7 +48,7 @@ variables:
 - name: sharedAksCluster
   value: $(sharedPrefix)-aks
 - name: ContainerRegistryAdminUser
-  value: prgdevappsharedcr
+  value: prg$(envAbbreviation)appsharedcr
 - name: appSharedPrefix
   value: prg-$(envAbbreviation)-app-sharedresources
 - name: appSharedResourceGroup
