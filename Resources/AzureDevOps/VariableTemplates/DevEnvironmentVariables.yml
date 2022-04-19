@@ -39,12 +39,6 @@ variables:
   value: https://dev.azure.com/prg-cloud/
 - name: keyVaultName
   value: $(sharedPrefix)-kv
-- name: ParentBusinessTag
-  value: Karis Ministries
-- name: ServiceOfferingTag
-  value: Karis Ministries Services
-- name: EnvironmentTag
-  value: Dev/Test
 - name: sharedAksCluster
   value: $(sharedPrefix)-aks
 - name: ContainerRegistryAdminUser
