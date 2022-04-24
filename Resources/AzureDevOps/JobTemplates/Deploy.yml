@@ -8,6 +8,8 @@ parameters:
 
 jobs:
 - deployment: Deploy_To_${{ parameters.Environment }}
+  workspace:
+    clean: all
   environment: ${{ parameters.Environment }}
   strategy:
     runOnce:

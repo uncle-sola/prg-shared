@@ -21,12 +21,14 @@ pr:
     - master
 
 pool:
-  vmImage: windows-latest
+  name: "MyPrivatePool"
 
 stages:
 - stage: Build
   jobs:
   - job: TestAndPublish
+    workspace:
+      clean: all
     variables:
     - template: VariableTemplates\DevEnvironmentVariables.yml
     steps:
@@ -36,6 +38,8 @@ stages:
         SolutionBaseName: $(SolutionBaseName)
         TokenizeTestParameters: true
   - job: CopyAndPublish
+    workspace:
+      clean: all
     steps:
     - task: CopyFiles@2
       displayName: 'Copy PSScripts Files to: $(Build.ArtifactStagingDirectory)'
